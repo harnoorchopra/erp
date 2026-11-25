@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Crime Reporting Portal — Live Interactive System</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+    .fade-in { animation: fadeIn 0.2s ease-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen flex flex-col">
+
+  <!-- Emergency Helpline Top Bar -->
+  <div class="bg-red-700 text-white text-xs py-2 px-4">
+    <div class="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-2">
+      <div class="flex flex-wrap items-center gap-3 font-medium">
+        <span class="inline-flex items-center gap-1 font-bold"><i data-lucide="phone-call" class="w-3.5 h-3.5"></i> Emergency: 112</span>
+        <span class="opacity-80">|</span>
+        <span>Police: 100</span>
+        <span class="opacity-80">|</span>
+        <span>Cyber Crime: 1930</span>
+        <span class="opacity-80">|</span>
+        <span>Women Helpline: 1091</span>
+      </div>
+      <span class="text-red-100 hidden sm:inline">24×7 Citizen Safety &amp; Incident Portal</span>
+    </div>
+  </div>
+
+  <!-- Navigation Header -->
+  <header class="bg-slate-900 text-white shadow-md sticky top-0 z-30">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-red-600 flex items-center justify-center shadow-sm">
+          <i data-lucide="shield-alert" class="w-5 h-5 text-white"></i>
+        </div>
+        <div>
+          <h1 class="font-bold text-base sm:text-lg leading-tight tracking-tight">Crime Reporting Portal</h1>
+          <p class="text-xs text-slate-400">Online Incident Filing &amp; Case Tracking</p>
+        </div>
+      </div>
+
+      <nav class="flex flex-wrap items-center gap-1.5 text-sm" id="main-nav">
+        <button data-tab="home" class="nav-btn px-3 py-1.5 rounded-lg font-medium transition flex items-center gap-1.5 bg-slate-800 text-white">
+          <i data-lucide="home" class="w-4 h-4"></i><span>Home</span>
+        </button>
+        <button data-tab="report" class="nav-btn px-3 py-1.5 rounded-lg font-medium transition flex items-center gap-1.5 text-slate-300 hover:bg-slate-800">
+          <i data-lucide="file-plus-2" class="w-4 h-4"></i><span>Report Crime</span>
+        </button>
+        <button data-tab="track" class="nav-btn px-3 py-1.5 rounded-lg font-medium transition flex items-center gap-1.5 text-slate-300 hover:bg-slate-800">
+          <i data-lucide="search" class="w-4 h-4"></i><span>Track Case</span>
+        </button>
+        <button data-tab="officer" class="nav-btn px-3 py-1.5 rounded-lg font-medium transition flex items-center gap-1.5 text-slate-300 hover:bg-slate-800">
+          <i data-lucide="badge-check" class="w-4 h-4"></i><span>Officer Portal</span>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="flex-1 max-w-6xl w-full mx-auto px-4 py-6 sm:py-8">
+
+    <!-- VIEW: HOME -->
+    <section id="view-home" class="space-y-6 fade-in">
+      <div class="bg-gradient-to-br from-slate-900 via-slate-900 to-slate-800 text-white rounded-2xl p-6 sm:p-8 shadow-lg border border-slate-800 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+        <div class="space-y-4 max-w-2xl">
+          <span class="inline-flex items-center gap-1.5 bg-red-600/20 text-red-300 border border-red-500/30 text-xs font-semibold px-3 py-1 rounded-full">
+            <i data-lucide="lock" class="w-3.5 h-3.5"></i> Encrypted &amp; Anonymous Option Available
+          </span>
+          <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight leading-snug">
+            Report Incidents Safely. Track Investigation Progress in Real Time.
+          </h2>
+          <p class="text-slate-300 text-sm sm:text-base leading-relaxed">
+            File cybercrime, theft, fraud, or public safety complaints online in minutes. Receive an instant Case ID, attach digital evidence, and follow every official update.
+          </p>
+          <div class="flex flex-wrap gap-3 pt-1">
+            <button data-goto="report" class="bg-red-600 hover:bg-red-700 text-white px-5 py-2.5 rounded-xl font-semibold text-sm transition inline-flex items-center gap-2 shadow-sm">
+              <i data-lucide="plus-circle" class="w-4 h-4"></i> File a Crime Report
+            </button>
+            <button data-goto="track" class="bg-slate-800 hover:bg-slate-700 text-white px-5 py-2.5 rounded-xl font-semibold text-sm border border-slate-700 transition inline-flex items-center gap-2">
+              <i data-lucide="radar" class="w-4 h-4"></i> Track Existing Case
+            </button>
+          </div>
+        </div>
+
+        <!-- Live KPI Grid -->
+        <div class="grid grid-cols-2 gap-3 w-full lg:w-80 shrink-0">
+          <div class="bg-slate-800/80 border border-slate-700/80 rounded-xl p-4">
+            <div class="text-xs text-slate-400 font-medium">Total Cases</div>
+            <div id="home-stat-total" class="text-2xl font-bold mt-1">0</div>
+          </div>
+          <div class="bg-slate-800/80 border border-slate-700/80 rounded-xl p-4">
+            <div class="text-xs text-slate-400 font-medium">Active Cases</div>
+            <div id="home-stat-active" class="text-2xl font-bold text-amber-400 mt-1">0</div>
+          </div>
+          <div class="bg-slate-800/80 border border-slate-700/80 rounded-xl p-4">
+            <div class="text-xs text-slate-400 font-medium">Resolved</div>
+            <div id="home-stat-resolved" class="text-2xl font-bold text-emerald-400 mt-1">0</div>
+          </div>
+          <div class="bg-slate-800/80 border border-slate-700/80 rounded-xl p-4">
+            <div class="text-xs text-slate-400 font-medium">High Priority</div>
+            <div id="home-stat-high" class="text-2xl font-bold text-red-400 mt-1">0</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Feature Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+          <div class="w-10 h-10 rounded-xl bg-red-50 text-red-600 flex items-center justify-center mb-3">
+            <i data-lucide="shield-check" class="w-5 h-5"></i>
+          </div>
+          <h3 class="font-bold text-base mb-1">Anonymous Whistleblowing</h3>
+          <p class="text-sm text-slate-600">Toggle anonymous mode on any report to withhold your name, phone, and email while still receiving a trackable Case ID.</p>
+        </div>
+        <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+          <div class="w-10 h-10 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center mb-3">
+            <i data-lucide="clock" class="w-5 h-5"></i>
+          </div>
+          <h3 class="font-bold text-base mb-1">Real-Time Case Timeline</h3>
+          <p class="text-sm text-slate-600">Every status change from Submitted to Under Review, Investigating, and Resolved is logged with officer remarks.</p>
+        </div>
+        <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+          <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center mb-3">
+            <i data-lucide="bar-chart-3" class="w-5 h-5"></i>
+          </div>
+          <h3 class="font-bold text-base mb-1">Officer Command Dashboard</h3>
+          <p class="text-sm text-slate-600">Authorized officers can filter incoming reports, assign investigating units, update case statuses, and view crime analytics.</p>
+        </div>
+      </div>
+
+      <!-- Recent Public Cases Preview -->
+      <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+          <div>
+            <h3 class="font-bold text-base">Recent Registered Case IDs (Quick Track)</h3>
+            <p class="text-xs text-slate-500">Click any Case ID to inspect its live investigation timeline</p>
+          </div>
+        </div>
+        <div id="home-recent-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"></div>
+      </div>
+    </section>
+
+    <!-- VIEW: REPORT CRIME -->
+    <section id="view-report" class="hidden max-w-3xl mx-auto fade-in">
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-8">
+        <div class="mb-6">
+          <h2 class="text-xl sm:text-2xl font-bold text-slate-900">File a Crime Report</h2>
+          <p class="text-sm text-slate-500 mt-1">Provide accurate incident details. For immediate life-threatening emergencies, call <strong>112</strong>.</p>
+        </div>
+
+        <form id="report-form" class="space-y-5">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label for="f-category" class="block text-sm font-medium text-slate-700 mb-1.5">Crime Category *</label>
+              <select id="f-category" required class="w-full border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm bg-white focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none">
+                <option value="Cyber Crime">Cyber Crime</option>
+                <option value="Theft & Burglary">Theft &amp; Burglary</option>
+                <option value="Fraud & Scam">Fraud &amp; Scam</option>
+                <option value="Assault & Harassment">Assault &amp; Harassment</option>
+                <option value="Public Nuisance">Public Nuisance</option>
+                <option value="Missing Person / Property">Missing Person / Property</option>
+              </select>
+            </div>
+            <div>
+              <label for="f-priority" class="block text-sm font-medium text-slate-700 mb-1.5">Priority Level</label>
+              <select id="f-priority" class="w-full border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm bg-white focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none">
+                <option value="Medium">Medium</option>
+                <option value="High">High (Urgent)</option>
+                <option value="Low">Low</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label for="f-title" class="block text-sm font-medium text-slate-700 mb-1.5">Incident Title *</label>
+            <input id="f-title" type="text" required placeholder="e.g., Unauthorized UPI Debit via Phishing Link" class="w-full border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none" />
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label for="f-date" class="block text-sm font-medium text-slate-700 mb-1.5">Date &amp; Time of Incident *</label>
+              <input id="f-date" type="datetime-local" required class="w-full border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none" />
+            </div>
+            <div>
+              <label for="f-location" class="block text-sm font-medium text-slate-700 mb-1.5">Location / Area *</label>
+              <input id="f-location" type="text" required placeholder="e.g., Model Town, Ludhiana" class="w-full border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none" />
+            </div>
+          </div>
+
+          <div>
+            <label for="f-desc" class="block text-sm font-medium text-slate-700 mb-1.5">Detailed Description *</label>
+            <textarea id="f-desc" rows="4" required placeholder="Describe what happened, suspect details, vehicle registration, or transaction references..." class="w-full border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none"></textarea>
+          </div>
+
+          <div>
+            <label for="f-evidence" class="block text-sm font-medium text-slate-700 mb-1.5">Attach Digital Evidence (Optional)</label>
+            <input id="f-evidence" type="file" class="w-full text-sm text-slate-600 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-slate-100 file:text-slate-700 hover:file:bg-slate-200 cursor-pointer" />
+            <p id="evidence-preview" class="text-xs text-slate-500 mt-1.5 hidden"></p>
+          </div>
+
+          <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-4">
+            <label class="flex items-center gap-2.5 cursor-pointer select-none">
+              <input type="checkbox" id="f-anon" class="w-4 h-4 rounded border-slate-300 text-red-600 focus:ring-red-500" />
+              <span class="text-sm font-semibold text-slate-800">Submit Anonymously (hide my personal contact details)</span>
+            </label>
+
+            <div id="reporter-fields" class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 border-t border-slate-200">
+              <div>
+                <label for="f-name" class="block text-xs font-medium text-slate-600 mb-1">Full Name</label>
+                <input id="f-name" type="text" placeholder="Your name" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-sm bg-white" />
+              </div>
+              <div>
+                <label for="f-phone" class="block text-xs font-medium text-slate-600 mb-1">Phone Number</label>
+                <input id="f-phone" type="tel" placeholder="+91-98765-XXXXX" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-sm bg-white" />
+              </div>
+              <div>
+                <label for="f-email" class="block text-xs font-medium text-slate-600 mb-1">Email Address</label>
+                <input id="f-email" type="email" placeholder="you@example.com" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-sm bg-white" />
+              </div>
+            </div>
+          </div>
+
+          <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 rounded-xl text-sm transition shadow-sm flex items-center justify-center gap-2">
+            <i data-lucide="send" class="w-4 h-4"></i> Submit Crime Report
+          </button>
+        </form>
+      </div>
+    </section>
+
+    <!-- VIEW: TRACK CASE -->
+    <section id="view-track" class="hidden max-w-3xl mx-auto space-y-5 fade-in">
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-8">
+        <h2 class="text-xl sm:text-2xl font-bold mb-1">Track Case Status</h2>
+        <p class="text-sm text-slate-500 mb-4">
+          Enter your Case ID or try a sample:
+          <button type="button" data-sample="CRP-2026-1042" class="sample-track-btn text-red-600 font-semibold underline ml-1">CRP-2026-1042</button>,
+          <button type="button" data-sample="CRP-2026-1089" class="sample-track-btn text-red-600 font-semibold underline ml-1">CRP-2026-1089</button>,
+          <button type="button" data-sample="CRP-2026-1104" class="sample-track-btn text-red-600 font-semibold underline ml-1">CRP-2026-1104</button>
+        </p>
+        <form id="track-form" class="flex flex-col sm:flex-row gap-2.5">
+          <input id="track-input" type="text" required placeholder="Enter Case ID (e.g., CRP-2026-1042)" class="flex-1 border border-slate-300 rounded-xl px-4 py-2.5 text-sm uppercase font-mono focus:ring-2 focus:ring-slate-900 outline-none" />
+          <button type="submit" class="bg-slate-900 hover:bg-slate-800 text-white px-6 py-2.5 rounded-xl text-sm font-semibold transition inline-flex items-center justify-center gap-2">
+            <i data-lucide="search" class="w-4 h-4"></i> Track Case
+          </button>
+        </form>
+
+        <div id="track-result" class="mt-6"></div>
+      </div>
+    </section>
+
+    <!-- VIEW: OFFICER PORTAL -->
+    <section id="view-officer" class="hidden space-y-6 fade-in">
+      <!-- Officer Login Card -->
+      <div id="officer-login-card" class="max-w-md mx-auto bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-8">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-10 h-10 rounded-xl bg-slate-900 text-white flex items-center justify-center">
+            <i data-lucide="shield" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h2 class="text-xl font-bold">Officer Command Login</h2>
+            <p class="text-xs text-slate-500">Authorized law enforcement access</p>
+          </div>
+        </div>
+        <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs text-slate-600 mb-4">
+          <strong>Demo Credentials:</strong> <code>officer@police.gov.in</code> / <code>Admin@123</code>
+        </div>
+        <form id="login-form" class="space-y-3.5">
+          <div>
+            <label for="login-email" class="block text-xs font-medium text-slate-700 mb-1">Official Email</label>
+            <input id="login-email" type="email" required value="officer@police.gov.in" class="w-full border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm" />
+          </div>
+          <div>
+            <label for="login-password" class="block text-xs font-medium text-slate-700 mb-1">Password</label>
+            <input id="login-password" type="password" required value="Admin@123" class="w-full border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm" />
+          </div>
+          <p id="login-error" class="text-xs text-red-600 hidden"></p>
+          <button type="submit" class="w-full bg-slate-900 hover:bg-slate-800 text-white py-2.5 rounded-xl text-sm font-semibold transition">Sign In to Dashboard</button>
+        </form>
+      </div>
+
+      <!-- Officer Dashboard -->
+      <div id="officer-dashboard" class="hidden space-y-6">
+        <div class="bg-white rounded-2xl border border-slate-200 p-5 flex flex-wrap items-center justify-between gap-4 shadow-sm">
+          <div class="flex items-center gap-3">
+            <div class="w-11 h-11 rounded-xl bg-slate-900 text-white flex items-center justify-center font-bold">RS</div>
+            <div>
+              <h2 class="font-bold text-lg">Insp. Rajveer Singh (Badge #PB-1042)</h2>
+              <p class="text-xs text-slate-500">Cyber &amp; Special Crimes Unit • Command Dashboard</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <button id="reset-demo-btn" class="px-3.5 py-2 rounded-xl border border-slate-200 hover:bg-slate-100 text-xs font-semibold text-slate-700 transition">Reset Demo Data</button>
+            <button id="logout-btn" class="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold transition">Logout</button>
+          </div>
+        </div>
+
+        <!-- Analytics Charts -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+          <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+            <h3 class="font-bold text-sm text-slate-800 mb-3">Cases by Category</h3>
+            <div class="relative h-72">
+              <canvas id="category-chart"></canvas>
+            </div>
+          </div>
+          <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+            <h3 class="font-bold text-sm text-slate-800 mb-3">Cases by Status</h3>
+            <div class="relative h-72">
+              <canvas id="status-chart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Filters & Table -->
+        <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-4">
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <h3 class="font-bold text-base">Case Management Queue</h3>
+            <div class="flex flex-wrap gap-2 w-full sm:w-auto">
+              <input id="filter-search" type="text" placeholder="Search ID, title, location..." class="border border-slate-300 rounded-xl px-3 py-1.5 text-sm flex-1 sm:w-52" />
+              <select id="filter-status" class="border border-slate-300 rounded-xl px-3 py-1.5 text-sm bg-white">
+                <option value="All">All Statuses</option>
+                <option value="Submitted">Submitted</option>
+                <option value="Under Review">Under Review</option>
+                <option value="Investigating">Investigating</option>
+                <option value="Resolved">Resolved</option>
+                <option value="Closed">Closed</option>
+              </select>
+              <select id="filter-category" class="border border-slate-300 rounded-xl px-3 py-1.5 text-sm bg-white">
+                <option value="All">All Categories</option>
+                <option value="Cyber Crime">Cyber Crime</option>
+                <option value="Theft & Burglary">Theft &amp; Burglary</option>
+                <option value="Fraud & Scam">Fraud &amp; Scam</option>
+                <option value="Assault & Harassment">Assault &amp; Harassment</option>
+                <option value="Public Nuisance">Public Nuisance</option>
+                <option value="Missing Person / Property">Missing Person / Property</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm text-left">
+              <thead class="text-xs text-slate-500 uppercase bg-slate-50 border-y border-slate-200">
+                <tr>
+                  <th class="py-3 px-3">Case ID</th>
+                  <th class="py-3 px-3">Incident</th>
+                  <th class="py-3 px-3">Category</th>
+                  <th class="py-3 px-3">Priority</th>
+                  <th class="py-3 px-3">Status</th>
+                  <th class="py-3 px-3">Assigned Unit</th>
+                  <th class="py-3 px-3 text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody id="officer-table-body" class="divide-y divide-slate-100"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Confirmation Modal (Report Submitted) -->
+  <div id="submit-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl space-y-4 fade-in">
+      <div class="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center mx-auto">
+        <i data-lucide="check-circle-2" class="w-7 h-7"></i>
+      </div>
+      <div class="text-center space-y-1">
+        <h3 class="text-lg font-bold">Crime Report Registered</h3>
+        <p class="text-sm text-slate-600">Save your unique Case ID below to track investigation updates.</p>
+      </div>
+      <div class="bg-slate-100 border border-slate-200 rounded-xl p-3 flex items-center justify-between">
+        <span id="modal-case-id" class="font-mono font-bold text-lg text-slate-900">CRP-2026-0000</span>
+        <button id="copy-case-btn" type="button" class="px-3 py-1.5 rounded-lg bg-white border border-slate-300 text-xs font-semibold hover:bg-slate-50 transition">Copy ID</button>
+      </div>
+      <div class="flex gap-2.5 pt-2">
+        <button id="modal-track-btn" type="button" class="flex-1 bg-slate-900 hover:bg-slate-800 text-white py-2.5 rounded-xl text-sm font-semibold">Track This Case</button>
+        <button id="modal-close-btn" type="button" class="px-4 py-2.5 rounded-xl border border-slate-300 text-sm font-semibold hover:bg-slate-50">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Officer Case Update Modal -->
+  <div id="update-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-xl space-y-4 fade-in">
+      <div class="flex items-center justify-between">
+        <div>
+          <span id="upd-case-id" class="font-mono text-xs text-slate-500"></span>
+          <h3 id="upd-case-title" class="font-bold text-base"></h3>
+        </div>
+        <button id="upd-close-btn" type="button" class="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+      <p id="upd-case-desc" class="text-xs text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-200"></p>
+      <form id="update-case-form" class="space-y-3.5">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label for="upd-status" class="block text-xs font-semibold text-slate-700 mb-1">Update Status</label>
+            <select id="upd-status" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-sm bg-white">
+              <option value="Submitted">Submitted</option>
+              <option value="Under Review">Under Review</option>
+              <option value="Investigating">Investigating</option>
+              <option value="Resolved">Resolved</option>
+              <option value="Closed">Closed</option>
+            </select>
+          </div>
+          <div>
+            <label for="upd-unit" class="block text-xs font-semibold text-slate-700 mb-1">Assigned Unit</label>
+            <input id="upd-unit" type="text" required class="w-full border border-slate-300 rounded-xl px-3 py-2 text-sm" />
+          </div>
+        </div>
+        <div>
+          <label for="upd-remark" class="block text-xs font-semibold text-slate-700 mb-1">Official Investigation Remark *</label>
+          <textarea id="upd-remark" rows="3" required placeholder="Enter official update visible on case timeline..." class="w-full border border-slate-300 rounded-xl px-3 py-2 text-sm"></textarea>
+        </div>
+        <div class="flex justify-end gap-2 pt-2">
+          <button type="button" id="upd-cancel-btn" class="px-4 py-2 rounded-xl border border-slate-300 text-sm font-semibold">Cancel</button>
+          <button type="submit" class="px-5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-sm font-semibold">Save Update</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="fixed bottom-5 right-5 z-50 hidden bg-slate-900 text-white text-xs sm:text-sm font-medium px-4 py-3 rounded-xl shadow-lg"></div>
+
+  <script>
+    const STORAGE_KEY = 'crp_portal_cases_v1';
+    const DEFAULT_CASES = [
+      {
+        case_id: 'CRP-2026-1042',
+        category: 'Cyber Crime',
+        title: 'UPI Phishing & Unauthorized Bank Debit',
+        description: 'Received a fraudulent KYC update SMS link. After clicking, Rs. 18,500 was debited via UPI without OTP.',
+        incident_date: '2026-11-22T14:30',
+        location: 'Model Town, Ludhiana',
+        priority: 'High',
+        status: 'Investigating',
+        is_anonymous: false,
+        reporter_name: 'Amanpreet Kaur',
+        reporter_phone: '+91-98765-43210',
+        reporter_email: 'amanpreet@example.com',
+        evidence_name: 'upi_receipt_screenshot.png',
+        assigned_unit: 'Cyber Crime Cell',
+        timeline: [
+          { status: 'Submitted', remark: 'Complaint registered on Crime Reporting Portal.', updated_by: 'System', timestamp: '2026-11-22 15:02' },
+          { status: 'Under Review', remark: 'Assigned to Cyber Crime Cell for preliminary verification.', updated_by: 'Insp. Rajveer Singh', timestamp: '2026-11-22 16:40' },
+          { status: 'Investigating', remark: 'Bank transaction trace initiated with nodal officer; wallet freeze requested.', updated_by: 'Insp. Rajveer Singh', timestamp: '2026-11-23 10:15' }
+        ]
+      },
+      {
+        case_id: 'CRP-2026-1089',
+        category: 'Theft & Burglary',
+        title: 'Two-Wheeler Theft Outside Market Complex',
+        description: 'Black Honda Activa parked outside Sarabha Nagar Market was stolen between 6:00 PM and 7:15 PM.',
+        incident_date: '2026-11-21T18:45',
+        location: 'Sarabha Nagar, Ludhiana',
+        priority: 'Medium',
+        status: 'Under Review',
+        is_anonymous: false,
+        reporter_name: 'Rohit Sharma',
+        reporter_phone: '+91-98140-11223',
+        reporter_email: 'rohit.s@example.com',
+        evidence_name: 'rc_copy.pdf',
+        assigned_unit: 'Division 5 Patrol',
+        timeline: [
+          { status: 'Submitted', remark: 'Complaint registered on Crime Reporting Portal.', updated_by: 'System', timestamp: '2026-11-21 19:30' },
+          { status: 'Under Review', remark: 'CCTV footage from nearby shopkeepers requested for verification.', updated_by: 'Insp. Rajveer Singh', timestamp: '2026-11-22 09:20' }
+        ]
+      },
+      {
+        case_id: 'CRP-2026-1104',
+        category: 'Public Nuisance',
+        title: 'Illegal Late-Night Street Racing',
+        description: 'Group of modified motorcycles racing at high speed near residential park after midnight.',
+        incident_date: '2026-11-20T00:40',
+        location: 'BRS Nagar, Ludhiana',
+        priority: 'Low',
+        status: 'Resolved',
+        is_anonymous: true,
+        reporter_name: null,
+        reporter_phone: null,
+        reporter_email: null,
+        evidence_name: null,
+        assigned_unit: 'PCR Night Squad',
+        timeline: [
+          { status: 'Submitted', remark: 'Anonymous complaint registered on Crime Reporting Portal.', updated_by: 'System', timestamp: '2026-11-20 01:05' },
+          { status: 'Investigating', remark: 'PCR Night Squad dispatched to BRS Nagar sector.', updated_by: 'Insp. Rajveer Singh', timestamp: '2026-11-20 23:30' },
+          { status: 'Resolved', remark: 'Night patrol increased; 3 vehicles impounded under Motor Vehicles Act.', updated_by: 'Insp. Rajveer Singh', timestamp: '2026-11-21 08:15' }
+        ]
+      },
+      {
+        case_id: 'CRP-2026-1135',
+        category: 'Fraud & Scam',
+        title: 'Fake Job Offer Advance Fee Scam',
+        description: 'Fraudulent recruiter demanded Rs. 12,000 processing fee for overseas placement and blocked contact.',
+        incident_date: '2026-11-23T11:15',
+        location: 'Civil Lines, Ludhiana',
+        priority: 'High',
+        status: 'Submitted',
+        is_anonymous: false,
+        reporter_name: 'Simranjit Singh',
+        reporter_phone: '+91-98720-55678',
+        reporter_email: 'simran.s@example.com',
+        evidence_name: 'chat_export.txt',
+        assigned_unit: 'Pending Assignment',
+        timeline: [
+          { status: 'Submitted', remark: 'Complaint registered on Crime Reporting Portal.', updated_by: 'System', timestamp: '2026-11-23 12:00' }
+        ]
+      }
+    ];
+
+    function loadCases() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        }
+      } catch (e) {}
+      return JSON.parse(JSON.stringify(DEFAULT_CASES));
+    }
+
+    function saveCases() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(cases));
+      } catch (e) {}
+    }
+
+    let cases = loadCases();
+    let isOfficerLoggedIn = false;
+    let activeEditCaseId = null;
+    let categoryChartInstance = null;
+    let statusChartInstance = null;
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      toast.textContent = msg;
+      toast.classList.remove('hidden');
+      setTimeout(() => toast.classList.add('hidden'), 2800);
+    }
+
+    function formatNow() {
+      const d = new Date();
+      const pad = n => String(n).padStart(2, '0');
+      return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    }
+
+    function statusBadge(status) {
+      const map = {
+        'Submitted': 'bg-slate-100 text-slate-700',
+        'Under Review': 'bg-sky-100 text-sky-800',
+        'Investigating': 'bg-amber-100 text-amber-800',
+        'Resolved': 'bg-emerald-100 text-emerald-800',
+        'Closed': 'bg-slate-200 text-slate-600'
+      };
+      return map[status] || 'bg-slate-100 text-slate-700';
+    }
+
+    function priorityBadge(priority) {
+      const map = {
+        'High': 'bg-red-100 text-red-700',
+        'Medium': 'bg-amber-50 text-amber-700',
+        'Low': 'bg-slate-100 text-slate-600'
+      };
+      return map[priority] || 'bg-slate-100 text-slate-600';
+    }
+
+    function switchTab(tab) {
+      document.querySelectorAll('main > section').forEach(s => s.classList.add('hidden'));
+      document.getElementById(`view-${tab}`).classList.remove('hidden');
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        const active = btn.dataset.tab === tab;
+        btn.classList.toggle('bg-slate-800', active);
+        btn.classList.toggle('text-white', active);
+        btn.classList.toggle('text-slate-300', !active);
+      });
+      if (tab === 'home') renderHome();
+      if (tab === 'officer' && isOfficerLoggedIn) renderOfficerDashboard();
+    }
+
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+      btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+    });
+    document.querySelectorAll('[data-goto]').forEach(btn => {
+      btn.addEventListener('click', () => switchTab(btn.dataset.goto));
+    });
+
+    function renderHome() {
+      const total = cases.length;
+      const active = cases.filter(c => c.status === 'Investigating' || c.status === 'Under Review' || c.status === 'Submitted').length;
+      const resolved = cases.filter(c => c.status === 'Resolved' || c.status === 'Closed').length;
+      const high = cases.filter(c => c.priority === 'High').length;
+
+      document.getElementById('home-stat-total').textContent = total;
+      document.getElementById('home-stat-active').textContent = active;
+      document.getElementById('home-stat-resolved').textContent = resolved;
+      document.getElementById('home-stat-high').textContent = high;
+
+      const listEl = document.getElementById('home-recent-list');
+      listEl.innerHTML = cases.slice(0, 6).map(c => `
+        <button type="button" data-quick-track="${c.case_id}" class="text-left border border-slate-200 hover:border-slate-400 rounded-xl p-3.5 transition bg-slate-50/50 hover:bg-white">
+          <div class="flex items-center justify-between gap-2 mb-1">
+            <span class="font-mono text-xs font-bold text-slate-700">${c.case_id}</span>
+            <span class="px-2 py-0.5 rounded-full text-[11px] font-semibold ${statusBadge(c.status)}">${c.status}</span>
+          </div>
+          <div class="font-semibold text-sm text-slate-900 line-clamp-1">${c.title}</div>
+          <div class="text-xs text-slate-500 mt-1">${c.category} • ${c.location}</div>
+        </button>
+      `).join('');
+
+      listEl.querySelectorAll('[data-quick-track]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          switchTab('track');
+          document.getElementById('track-input').value = btn.dataset.quickTrack;
+          renderTrackResult(btn.dataset.quickTrack);
+        });
+      });
+    }
+
+    // Anonymous toggle & Evidence preview
+    document.getElementById('f-anon').addEventListener('change', (e) => {
+      document.getElementById('reporter-fields').classList.toggle('hidden', e.target.checked);
+    });
+
+    document.getElementById('f-evidence').addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      const preview = document.getElementById('evidence-preview');
+      if (file) {
+        preview.textContent = `Selected: ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+        preview.classList.remove('hidden');
+      } else {
+        preview.classList.add('hidden');
+      }
+    });
+
+    // Submit Crime Report
+    document.getElementById('report-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const anon = document.getElementById('f-anon').checked;
+      const evidenceInput = document.getElementById('f-evidence');
+      const evidenceFile = evidenceInput.files[0] ? evidenceInput.files[0].name : null;
+
+      let newId = `CRP-2026-${Math.floor(2000 + Math.random() * 7999)}`;
+      while (cases.some(c => c.case_id === newId)) {
+        newId = `CRP-2026-${Math.floor(2000 + Math.random() * 7999)}`;
+      }
+
+      const newCase = {
+        case_id: newId,
+        category: document.getElementById('f-category').value,
+        title: document.getElementById('f-title').value.trim(),
+        description: document.getElementById('f-desc').value.trim(),
+        incident_date: document.getElementById('f-date').value,
+        location: document.getElementById('f-location').value.trim(),
+        priority: document.getElementById('f-priority').value,
+        status: 'Submitted',
+        is_anonymous: anon,
+        reporter_name: anon ? null : (document.getElementById('f-name').value.trim() || 'Citizen'),
+        reporter_phone: anon ? null : document.getElementById('f-phone').value.trim(),
+        reporter_email: anon ? null : document.getElementById('f-email').value.trim(),
+        evidence_name: evidenceFile,
+        assigned_unit: 'Pending Assignment',
+        timeline: [
+          {
+            status: 'Submitted',
+            remark: anon ? 'Anonymous complaint registered on Crime Reporting Portal.' : 'Complaint registered on Crime Reporting Portal.',
+            updated_by: 'System',
+            timestamp: formatNow()
+          }
+        ]
+      };
+
+      cases.unshift(newCase);
+      saveCases();
+      e.target.reset();
+      document.getElementById('reporter-fields').classList.remove('hidden');
+      document.getElementById('evidence-preview').classList.add('hidden');
+
+      document.getElementById('modal-case-id').textContent = newId;
+      const modal = document.getElementById('submit-modal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      renderHome();
+    });
+
+    // Submit Modal Controls
+    document.getElementById('copy-case-btn').addEventListener('click', () => {
+      const id = document.getElementById('modal-case-id').textContent;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(id).then(() => showToast('Case ID copied to clipboard')).catch(() => fallbackCopy(id));
+      } else {
+        fallbackCopy(id);
+      }
+    });
+
+    function fallbackCopy(text) {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand('copy'); showToast('Case ID copied to clipboard'); } catch (e) {}
+      document.body.removeChild(ta);
+    }
+
+    document.getElementById('modal-close-btn').addEventListener('click', () => {
+      const modal = document.getElementById('submit-modal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    });
+
+    document.getElementById('modal-track-btn').addEventListener('click', () => {
+      const id = document.getElementById('modal-case-id').textContent;
+      const modal = document.getElementById('submit-modal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+      switchTab('track');
+      document.getElementById('track-input').value = id;
+      renderTrackResult(id);
+    });
+
+    // Track Case
+    function renderTrackResult(rawId) {
+      const id = rawId.trim().toUpperCase();
+      const container = document.getElementById('track-result');
+      const found = cases.find(c => c.case_id === id);
+
+      if (!found) {
+        container.innerHTML = `
+          <div class="p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm">
+            No case found matching <strong>${id}</strong>. Please verify the Case ID and try again.
+          </div>`;
+        return;
+      }
+
+      container.innerHTML = `
+        <div class="border border-slate-200 rounded-2xl p-5 space-y-4 bg-slate-50/40">
+          <div class="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <span class="font-mono text-xs font-bold text-slate-500">${found.case_id}</span>
+              <h3 class="text-lg font-bold text-slate-900 mt-0.5">${found.title}</h3>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="px-2.5 py-1 rounded-full text-xs font-semibold ${priorityBadge(found.priority)}">${found.priority} Priority</span>
+              <span class="px-3 py-1 rounded-full text-xs font-semibold ${statusBadge(found.status)}">${found.status}</span>
+            </div>
+          </div>
+
+          <p class="text-sm text-slate-700 leading-relaxed">${found.description}</p>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs bg-white p-3.5 rounded-xl border border-slate-200">
+            <div><span class="text-slate-400 block">Category</span><strong class="text-slate-800">${found.category}</strong></div>
+            <div><span class="text-slate-400 block">Location</span><strong class="text-slate-800">${found.location}</strong></div>
+            <div><span class="text-slate-400 block">Assigned Unit</span><strong class="text-slate-800">${found.assigned_unit}</strong></div>
+          </div>
+
+          ${found.evidence_name ? `<div class="text-xs text-slate-600"><strong>Attached Evidence:</strong> <span class="font-mono bg-slate-200/70 px-2 py-0.5 rounded">${found.evidence_name}</span></div>` : ''}
+
+          <div class="pt-2">
+            <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3">Investigation Timeline</h4>
+            <div class="space-y-3 border-l-2 border-slate-300 ml-2 pl-4">
+              ${found.timeline.map(t => `
+                <div class="relative bg-white p-3 rounded-xl border border-slate-200 shadow-2xs">
+                  <span class="absolute -left-[23px] top-4 w-3 h-3 rounded-full bg-slate-900 border-2 border-white"></span>
+                  <div class="flex flex-wrap items-center justify-between gap-2">
+                    <span class="px-2 py-0.5 rounded-full text-[11px] font-semibold ${statusBadge(t.status)}">${t.status}</span>
+                    <span class="text-[11px] text-slate-400 font-mono">${t.timestamp}</span>
+                  </div>
+                  <p class="text-sm text-slate-800 mt-1.5">${t.remark}</p>
+                  <p class="text-[11px] text-slate-500 mt-1">Updated by: ${t.updated_by}</p>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    document.getElementById('track-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      renderTrackResult(document.getElementById('track-input').value);
+    });
+
+    document.querySelectorAll('.sample-track-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.getElementById('track-input').value = btn.dataset.sample;
+        renderTrackResult(btn.dataset.sample);
+      });
+    });
+
+    // Officer Portal Auth & Dashboard
+    document.getElementById('login-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const email = document.getElementById('login-email').value.trim();
+      const pass = document.getElementById('login-password').value;
+      const errEl = document.getElementById('login-error');
+
+      if (email === 'officer@police.gov.in' && pass === 'Admin@123') {
+        errEl.classList.add('hidden');
+        isOfficerLoggedIn = true;
+        document.getElementById('officer-login-card').classList.add('hidden');
+        document.getElementById('officer-dashboard').classList.remove('hidden');
+        renderOfficerDashboard();
+        showToast('Signed in as Insp. Rajveer Singh');
+      } else {
+        errEl.textContent = 'Invalid credentials. Use officer@police.gov.in / Admin@123';
+        errEl.classList.remove('hidden');
+      }
+    });
+
+    document.getElementById('logout-btn').addEventListener('click', () => {
+      isOfficerLoggedIn = false;
+      document.getElementById('officer-login-card').classList.remove('hidden');
+      document.getElementById('officer-dashboard').classList.add('hidden');
+      showToast('Logged out');
+    });
+
+    document.getElementById('reset-demo-btn').addEventListener('click', () => {
+      cases = JSON.parse(JSON.stringify(DEFAULT_CASES));
+      saveCases();
+      renderOfficerDashboard();
+      renderHome();
+      showToast('Demo data restored');
+    });
+
+    function renderOfficerDashboard() {
+      renderOfficerTable();
+      renderCharts();
+    }
+
+    function renderOfficerTable() {
+      const search = document.getElementById('filter-search').value.trim().toLowerCase();
+      const statusF = document.getElementById('filter-status').value;
+      const catF = document.getElementById('filter-category').value;
+
+      const filtered = cases.filter(c => {
+        const matchSearch = !search || c.case_id.toLowerCase().includes(search) || c.title.toLowerCase().includes(search) || c.location.toLowerCase().includes(search);
+        const matchStatus = statusF === 'All' || c.status === statusF;
+        const matchCat = catF === 'All' || c.category === catF;
+        return matchSearch && matchStatus && matchCat;
+      });
+
+      const tbody = document.getElementById('officer-table-body');
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" class="py-6 text-center text-sm text-slate-500">No cases match the current filters.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(c => `
+        <tr class="hover:bg-slate-50/80">
+          <td class="py-3 px-3 font-mono text-xs font-bold text-slate-700">${c.case_id}</td>
+          <td class="py-3 px-3">
+            <div class="font-semibold text-slate-900">${c.title}</div>
+            <div class="text-xs text-slate-500">${c.location}</div>
+          </td>
+          <td class="py-3 px-3 text-xs text-slate-700">${c.category}</td>
+          <td class="py-3 px-3"><span class="px-2 py-0.5 rounded-full text-[11px] font-semibold ${priorityBadge(c.priority)}">${c.priority}</span></td>
+          <td class="py-3 px-3"><span class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold ${statusBadge(c.status)}">${c.status}</span></td>
+          <td class="py-3 px-3 text-xs text-slate-700">${c.assigned_unit}</td>
+          <td class="py-3 px-3 text-right">
+            <button type="button" data-manage="${c.case_id}" class="px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold transition">Manage</button>
+          </td>
+        </tr>
+      `).join('');
+
+      tbody.querySelectorAll('[data-manage]').forEach(btn => {
+        btn.addEventListener('click', () => openUpdateModal(btn.dataset.manage));
+      });
+    }
+
+    ['filter-search', 'filter-status', 'filter-category'].forEach(id => {
+      document.getElementById(id).addEventListener('input', renderOfficerTable);
+      document.getElementById(id).addEventListener('change', renderOfficerTable);
+    });
+
+    function openUpdateModal(caseId) {
+      const c = cases.find(x => x.case_id === caseId);
+      if (!c) return;
+      activeEditCaseId = caseId;
+      document.getElementById('upd-case-id').textContent = c.case_id;
+      document.getElementById('upd-case-title').textContent = c.title;
+      document.getElementById('upd-case-desc').textContent = c.description;
+      document.getElementById('upd-status').value = c.status;
+      document.getElementById('upd-unit').value = c.assigned_unit;
+      document.getElementById('upd-remark').value = '';
+      const modal = document.getElementById('update-modal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeUpdateModal() {
+      const modal = document.getElementById('update-modal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+      activeEditCaseId = null;
+    }
+
+    document.getElementById('upd-close-btn').addEventListener('click', closeUpdateModal);
+    document.getElementById('upd-cancel-btn').addEventListener('click', closeUpdateModal);
+
+    document.getElementById('update-case-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const c = cases.find(x => x.case_id === activeEditCaseId);
+      if (!c) return;
+      const newStatus = document.getElementById('upd-status').value;
+      const newUnit = document.getElementById('upd-unit').value.trim();
+      const remark = document.getElementById('upd-remark').value.trim();
+
+      c.status = newStatus;
+      c.assigned_unit = newUnit;
+      c.timeline.push({
+        status: newStatus,
+        remark,
+        updated_by: 'Insp. Rajveer Singh',
+        timestamp: formatNow()
+      });
+
+      saveCases();
+      closeUpdateModal();
+      renderOfficerDashboard();
+      renderHome();
+      showToast(`Case ${c.case_id} updated to ${newStatus}`);
+    });
+
+    function renderCharts() {
+      const catCounts = {};
+      const statusCounts = { 'Submitted': 0, 'Under Review': 0, 'Investigating': 0, 'Resolved': 0, 'Closed': 0 };
+
+      cases.forEach(c => {
+        catCounts[c.category] = (catCounts[c.category] || 0) + 1;
+        statusCounts[c.status] = (statusCounts[c.status] || 0) + 1;
+      });
+
+      const catCtx = document.getElementById('category-chart').getContext('2d');
+      if (categoryChartInstance) categoryChartInstance.destroy();
+      categoryChartInstance = new Chart(catCtx, {
+        type: 'bar',
+        data: {
+          labels: Object.keys(catCounts),
+          datasets: [{
+            label: 'Reports',
+            data: Object.values(catCounts),
+            backgroundColor: '#0f172a',
+            borderRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
+        }
+      });
+
+      const statCtx = document.getElementById('status-chart').getContext('2d');
+      if (statusChartInstance) statusChartInstance.destroy();
+      statusChartInstance = new Chart(statCtx, {
+        type: 'doughnut',
+        data: {
+          labels: Object.keys(statusCounts),
+          datasets: [{
+            data: Object.values(statusCounts),
+            backgroundColor: ['#64748b', '#0284c7', '#d97706', '#059669', '#334155']
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { position: 'bottom' } }
+        }
+      });
+    }
+
+    // Initialize icons and Home view
+    if (window.lucide) window.lucide.createIcons();
+    renderHome();
+  </script>
+</body>
+</html>
